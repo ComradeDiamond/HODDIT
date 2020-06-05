@@ -1,0 +1,102 @@
+<!DOCTYPE HTML>
+<html>
+	<head>
+		<title>HODDIT</title>
+		<style>
+			body
+			{
+				padding-left: 2%;
+			}
+			h1
+			{
+				color: #3197e0;
+				font: 36pt georgia;
+			}
+			h1 + p
+			{
+				font: 20pt calibri light;
+			}
+			h1 + p + img
+			{
+				width: 20%;
+				position: absolute;
+				top: 5%;
+				right: 5%;
+			}
+			img + hr
+			{
+				margin-right: 4%;
+			}
+			.sex
+			{
+				font-size: 48pt;
+				position: relative;
+				left: 43%;
+				cursor: pointer;
+			}
+			.mainImageCSS
+			{
+				height: 70vh;
+				padding-left: 5%;
+			}
+		</style>
+		<script src="diagnosis.js"></script>
+		<script>
+			function initialize() {
+				male = document.getElementById("maleHTML");
+				female = document.getElementById("femaleHTML");
+				mainImage = document.getElementById("mainImageHTML");
+				diagnosisJS = document.getElementById("diagnosisHTML");
+				symptomsJS = document.getElementById("symptomsHTML");
+				treatmentsJS = document.getElementById("treatmentsHTML");
+			}
+			function displayGuess(topGuess) {
+				let name = topGuess.name;
+				let symptoms = topGuess.symptoms;
+
+				for (var i in topGuess.symptoms)
+				{
+					//DIsplay the thing
+				}
+
+				let treatments = topGuess.treatments;
+
+				for (var i in topGuess.treatments)
+				{
+					//DIsplay the thing
+				}
+			}
+			function imageSwap(imgName) {
+				mainImage.src = `Images/${imgName}.jpg`
+			}
+		</script>
+	</head>
+	<body onload="initialize();">
+		<h1>Human Online Diagnosis Ditto Individual Tool</h1>
+		<p>
+			Sumbit your symptoms through the machine, and when you're ready, hit the diagnoise button!<br />
+			Note that some symptoms will only be unlocked through other symptoms. <br />
+			Those symptoms appear in gold and usually leads to a decisive conclusion. <br />
+			Seal is not responsible for any brainlet things you might do with this tool.
+		</p>
+		<img src="Images/chonkySeal.jpg" />
+		<hr />
+
+		<!--Determines the sex of the model. !-->
+		<span class="sex" id="maleHTML" style="color:blue;" onclick="imageSwap('Guy');">&#x2642;</span> 
+		&emsp;&emsp; 
+		<span class="sex" id="femaleHTML" style="color:pink;" onclick="imageSwap('Wamen');">&#x2640;</span> <br />
+
+		<!--The superstar model!-->
+		<img src="Images/cat.png" id="mainImageHTML" class="mainImageCSS" />
+		<hr />
+
+		<!--Tells you what thing you have!-->
+		<div>
+			Your diagnosis:
+			<div id="diagnosisHTML"></div>
+			<div id="symptomsHTML"></div>
+			<div id="treatmentsHTML"></div>
+		</div>
+	</body>
+</html>
