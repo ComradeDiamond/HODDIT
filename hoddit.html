@@ -6,6 +6,7 @@
 			body
 			{
 				padding-left: 2%;
+				overflow-x: hidden;
 			}
 			h1
 			{
@@ -36,38 +37,209 @@
 			}
 			.mainImageCSS
 			{
-				height: 70vh;
+				height: 552px;
 				padding-left: 5%;
+			}
+			map
+			{
+				cursor: pointer;
+			}
+			map + div
+			{
+				width: 40%;
+				position: absolute;
+				top: 45%;
+				background-color: white;
+				border-left: : 3px outset black;
+				box-shadow: 3px 3px 3px 3px lightgrey;
+				left: 100%;
+				font: 32pt calibri light;
+				color: lightblue;
+				text-align: center;
+			}
+			map + div div
+			{
+				text-align: left;
+				color: black;
+				font-size: 18pt;
+				padding-left: 4px;
+				margin-bottom: 8px;
+				cursor: pointer;
+			}
+			map + div div:hover
+			{
+				background-color: #e0e0e0;
+			}
+			@keyframes slideIn
+			{
+				from {left: 100%;}
+				to {left: 60%;}
+			}
+			@keyframes slideOut
+			{
+				from {left: 60%;}
+				to {left: 100%;}
+			}
+			.slideOutCSS
+			{
+				animation-name: slideOut;
+				animation-duration: 1s;
+				animation-fill-mode: forwards;
+			}
+			.slideInCSS
+			{
+				animation-name: slideIn;
+				animation-duration: 1s;
+				animation-fill-mode: forwards;
+			}
+			hr + div
+			{
+				font: 24pt calibri light;
+				color: #3ad631;
+				position: relative;
+			}
+			hr + div div, hr + div span
+			{
+				font: bold 18pt calibri light;
+				color: black;
+			}
+			.treatmentDescriptionCSS
+			{
+				font: 14pt calibri light;
+				padding-bottom: 2%;
+				width: 20%;
 			}
 		</style>
 		<script src="diagnosis.js"></script>
 		<script>
 			function initialize() {
+				selectionDiv = document.getElementById("selectionDivHTML");
 				male = document.getElementById("maleHTML");
 				female = document.getElementById("femaleHTML");
 				mainImage = document.getElementById("mainImageHTML");
 				diagnosisJS = document.getElementById("diagnosisHTML");
 				symptomsJS = document.getElementById("symptomsHTML");
 				treatmentsJS = document.getElementById("treatmentsHTML");
+				itemOpen = false;
+
+				//addElement([symptomList.tummyAche]);
+				exOut();
 			}
-			function displayGuess(topGuess) {
-				let name = topGuess.name;
-				let symptoms = topGuess.symptoms;
+			function imageSwap(imgName) {
+				mainImage.src = `Images/${imgName}.jpg`;
+				mainImage.useMap = `#${imgName}ImageMap`;
+			}
+			function addElement(list) { //Shows the taskbar to choose stuff
+				
+				if (itemOpen) //If the item is open, just delete it and replace it
+				{
+					for (var c=(selectionDiv.children.length-1); c>1; c--) {
+						//Apparently the child elements shift in position after deletion
+						selectionDiv.children[c].remove();
+					}
+				}
+
+				itemOpen = true;
+				for (var i in list)
+				{
+					let tempNumber = i; //So we don't lose this after for loop
+					let temp = document.createElement("div");
+					temp.style.borderLeft = "5px outset #1887f0"; //These are before prereq because they could change
+
+					if (list[i].prerequisite != undefined) //Checks whether it should reveal the secret symptoms
+					{
+						if (list[i].checkPrerequisite())
+						{
+							temp.style.borderLeft = "2px outset gold";
+						}
+						else
+						{
+							continue;
+						}
+					}
+
+					if (symptoms.indexOf(list[i].n) != -1) //If the thing exists, don't make it
+					{
+						continue;
+					}
+
+					temp.innerHTML = `${list[i].n}: <br />${list[i].description}`;
+
+					temp.addEventListener("click", function() { //When something is clicked, remove the thing
+						symptoms.push(list[tempNumber].n);
+
+						for (var c=(selectionDiv.children.length-1); c>1; c--) {
+							//Apparently the child elements shift in position after deletion
+							selectionDiv.children[c].remove();
+						}
+						selectionDiv.className = "slideOutCSS";	
+						itemOpen = false;
+					})
+					selectionDiv.appendChild(temp);
+				}
+				selectionDiv.className = "slideInCSS";
+			}
+			function exOut() { //Creates an X-out button that gets rid of the chart
+
+				let xOutButton = document.createElement("button");
+				xOutButton.innerHTML = "X";
+				xOutButton.style.border = `3px solid #52fa9e`;
+				xOutButton.backgroundColor = `white`;
+
+				xOutButton.addEventListener("click", function() {
+					for (var c=(selectionDiv.children.length-1); c>1; c--) { 
+						if (c == 0 || c == 1) { 
+
+							continue;
+						}
+
+						(selectionDiv.children[c]).remove();
+					}
+					selectionDiv.className = "slideOutCSS";
+					itemOpen = false;
+				})
+
+				selectionDiv.appendChild(xOutButton);
+			}
+			function displayGuess(topGuess) { //Display the best guess
+
+				treatmentsJS.innerHTML = ""; //First things first, just clear all the stuff inside treatmentJS
+
+				diagnosisJS.innerHTML = topGuess.name;
+				let tempSymptom = "";
 
 				for (var i in topGuess.symptoms)
 				{
-					//DIsplay the thing
+					if (i == (topGuess.symptoms.length-1)) //For grammar purposes, leave out the comma for the last one
+					{
+						tempSymptom += topGuess.symptoms[i];
+					}
+					else
+					{
+						tempSymptom += `${topGuess.symptoms[i]}, `;
+					}
 				}
 
-				let treatments = topGuess.treatments;
+				symptomsJS.innerHTML = tempSymptom;
 
-				for (var i in topGuess.treatments)
+				for (var c in topGuess.treatment)
 				{
-					//DIsplay the thing
+					let tempSpan = document.createElement("span");
+					tempSpan.innerHTML = topGuess.treatment[c].n;
+
+					let tempDiv = document.createElement("div");
+					tempDiv.innerHTML = topGuess.treatment[c].description;
+					tempDiv.className = "treatmentDescriptionCSS";
+
+					let tempImg = document.createElement("img");
+					tempImg.style.left = "30%";
+					tempImg.width = "5%";
+					tempImg.src = topGuess.treatment[c].image;
+
+					treatmentsJS.appendChild(tempSpan);
+					treatmentsJS.appendChild(tempImg);
+					treatmentsJS.appendChild(tempDiv);
 				}
-			}
-			function imageSwap(imgName) {
-				mainImage.src = `Images/${imgName}.jpg`
 			}
 		</script>
 	</head>
@@ -82,20 +254,54 @@
 		<img src="Images/chonkySeal.jpg" />
 		<hr />
 
-		<!--Determines the sex of the model. !-->
-		<span class="sex" id="maleHTML" style="color:blue;" onclick="imageSwap('Guy');">&#x2642;</span> 
+		<!--Determines the sex of the model.-->
+		<span class="sex" id="maleHTML" style="color:blue;" onclick="imageSwap('guy');">&#x2642;</span> 
 		&emsp;&emsp; 
-		<span class="sex" id="femaleHTML" style="color:pink;" onclick="imageSwap('Wamen');">&#x2640;</span> <br />
+		<span class="sex" id="femaleHTML" style="color:pink;" onclick="imageSwap('wamen');">&#x2640;</span> <br />
 
-		<!--The superstar model!-->
-		<img src="Images/cat.png" id="mainImageHTML" class="mainImageCSS" />
+		<!--The mode-->
+		<img src="Images/cat.png" id="mainImageHTML" class="mainImageCSS"/>
+
+		<map name="guyImageMap">
+    		<area alt="Eyes" title="Eyes" onclick="addElement(symptomEyes);" coords="279,46,313,54" shape="rect" />
+    		<area alt="Head" title="Head" onclick="addElement(symptomHead);" coords="275,17,322,43" shape="rect" />
+    		<area alt="Mouth" title="Mouth" onclick="addElement(symptomMouth);" coords="297,68,323,74" shape="rect" />
+    		<area alt="Body" title="Body" onclick="addElement(symptomBody);" coords="254,111,356,292" shape="rect" />
+    		<area alt="Arms1" title="Arms1" onclick="addElement(symptomArms);" coords="125,127,200,165,239,114,238,167,203,198,130,146" shape="poly" />
+   		 	<area alt="Arms2" title="Arms2" onclick="addElement(symptomArms);" coords="355,168,374,126,375,308,353,296" shape="poly" />
+   			<area alt="Legs" title="Legs" onclick="addElement(symptomLegs);" coords="251,298,349,529" shape="rect" />
+		</map>
+
+		<map name="wamenImageMap">
+			<area alt="Eyes" title="Eyes" onclick="addElement(symptomEyes);" coords="249,54,283,65" shape="rect" />
+    		<area alt="Head" title="Head" onclick="addElement(symptomHead);" coords="247,34,291,51" shape="rect" />
+    		<area alt="Mouth" title="Mouth" onclick="addElement(symptomMouth);" coords="252,76,275,85" shape="rect" />
+    		<area alt="Body" title="Body" onclick="addElement(symptomBody);" coords="227,118,306,251" shape="rect" />
+    		<area alt="Arms1" title="Arms1" onclick="addElement(symptomArms);" coords="213,116,220,139,200,269,184,285" shape="poly" />
+   		 	<area alt="Arms2" title="Arms2" onclick="addElement(symptomArms);" coords="305,156,318,114,326,290,307,285" shape="poly" />
+   			<area alt="Legs" title="Legs" onclick="addElement(symptomLegs);" coords="209,260,299,522" shape="rect" />
+		</map>
+
+		<!--Taskbar picker-->
+
+		<div id="selectionDivHTML">
+			Symptom Selection <br />
+		</div>
+
+		<button onclick="displayGuess(flu);">Diagnosis</button>
 		<hr />
 
-		<!--Tells you what thing you have!-->
+		<!--Tells you what thing you have-->
 		<div>
 			Your diagnosis:
 			<div id="diagnosisHTML"></div>
+			<br />
+
+			Here's are the prevalent symptoms for the disease:
 			<div id="symptomsHTML"></div>
+			<br />
+
+			Treatments:
 			<div id="treatmentsHTML"></div>
 		</div>
 	</body>
