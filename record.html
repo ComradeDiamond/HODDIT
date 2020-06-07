@@ -1,0 +1,93 @@
+<!DOCTYPE HTML>
+<html>
+	<head>
+		<title></title>
+		<style>
+			body
+			{
+				text-align: center;
+			}
+			h1
+			{
+				font: 52pt impact;
+				color: #03befc;
+			}
+			h2
+			{
+				font: 42pt calibri light;
+			}
+			hr
+			{
+				margin-left: 5%;
+				margin-right: 5%;
+			}
+			ul
+			{
+				font: 28pt calibri;
+				text-align: left;
+			}
+			button
+			{
+				border-radius: 4px;
+				color: white;
+				padding: 4px;
+				border: 1px solid #f0c400;
+				background-color: #03befc;
+				font: 24pt calibri;
+			}
+			img
+			{
+				position: absolute;
+				right: 20%;
+				top: 40vh;
+			}
+		</style>
+		<script>
+			function initialize() {
+
+				recordDiv = document.getElementById("recordDivHTML");
+
+				try
+				{
+					userPosition = parseInt(JSON.parse(localStorage.userPosition));
+					localStorageArray = JSON.parse(localStorage.data);
+					record = localStorageArray[userPosition].record;
+
+					if (record.length == 0) {
+						throw "Not enough info";
+					}
+				}
+				catch
+				{
+					alert("Looks like you don't have a medical record you brainlet");
+				}
+
+				for (var i in record)
+				{
+					let tempItem = document.createElement("li");
+					tempItem.innerHTML = record[i];
+					
+					recordDiv.appendChild(tempItem);
+				}
+			}
+			function wipeData() {
+				localStorage.data = "";
+				localStorage.userPosition = "";
+			}
+		</script>
+	</head>
+	<body onload="initialize();">
+		<h1>Medical Record</h1>
+		<h2>Here's where you see all your oofies in the past!</h2>
+
+		<hr />
+
+		<ul id="recordDivHTML">
+			Your medical records and disease names are here:
+		</ul>
+		<br />
+		<br />
+		<button onclick="wipeData()">Destroy Local Storage</button>
+		<img src="Images/tmgSeal4.jpg" />
+	</body>
+</html>

@@ -1,0 +1,280 @@
+<!DOCTYPE HTML>
+<html>
+	<head>
+		<title></title>
+		<style>
+			body
+			{
+				text-align: center;
+			}
+			.inputCSS
+			{
+				font: 18pt comic sans ms;
+				border: none;
+				border-bottom: 2px solid #fad841;
+			}
+			button
+			{
+				border-radius: 4px;
+				color: white;
+				padding: 4px;
+				border: 1px solid #f0c400;
+				background-color: #f0c400;
+				font: 24pt calibri;
+			}
+			@keyframes transFade
+			{
+				0% {opacity: 100%;}
+				50% {opacity: 0%;}
+				100% {opacity: 100%;}
+			}
+			.frontalBackendTransfade
+			{
+				animation-name: transFade;
+				animation-fill-mode: forwards;
+				animation-duration: 4s;
+			}
+			h1
+			{
+				font: 52pt impact;
+				color: gold;
+			}
+			h2
+			{
+				font: 42pt calibri light;
+			}
+			hr + div
+			{
+				position: relative;
+				top: 15vh;
+				font: bold 28pt calibri;
+			}
+			hr + div div
+			{
+				font: 28pt calibri light;
+			}
+			hr
+			{
+				margin-left: 5%;
+				margin-right: 5%;
+			}
+			img
+			{
+				position: absolute;
+			}
+			div + img
+			{
+				left: 10%;
+				top: 40vh;
+			}
+			img + img
+			{
+				right: 12%;
+				bottom: 5vh;
+			}
+			img + img + img
+			{
+				top: 2vh;
+				right: 20%;
+			}
+			img + img + img + span
+			{
+				position: absolute;
+				right: 5%;
+				top: 50vh;
+				font: 12pt calibri light;
+			}
+		</style>
+		<script>
+			function User(username, password)
+			{
+				this.username = username;
+				this.password = password;
+				this.record = [];
+			}
+
+			function initialize()
+			{
+				loginDiv = document.getElementById("loginDivHTML");
+				loginQuery = false;
+
+				try
+				{
+					localStorageArray = JSON.parse(localStorage.data);
+				}
+				catch
+				{
+					localStorageArray = [];
+				}
+
+				divSwap(true);
+			}
+
+			function login(username, password)
+			{
+				let tempBoolean = false;
+				for (var i in localStorageArray)
+				{
+					if (username == localStorageArray[i].username)
+					{
+						tempBoolean = true;
+						if (localStorageArray[i].password == password)
+						{
+							localStorage.userPosition = JSON.stringify(i); //The golden key later when we access localStorageArray
+
+							window.open("hoddit.html");
+						}
+						else
+						{
+							alert("Your password is wrong lmao");
+						}
+					}
+				}
+				if (!tempBoolean)
+				{
+					alert("Your username does not exist");
+				}
+			}
+			function createUser(username, password)
+			{
+				localStorageArray.push(new User(username, password));
+				localStorage.data = JSON.stringify(localStorageArray);
+			}
+			function checkDuplicate(duplicate)
+			{
+				let duplicateStatus = false;
+
+				//Checks for duplicates when creating passwords
+				for (var i in localStorageArray)
+				{
+					if (localStorageArray[i].username == duplicate)
+					{
+						duplicateStatus = true;
+						break;
+					} 
+				}
+
+				return duplicateStatus;
+			}
+			function divSwap(isLogin) //If it's not login, it's creating something
+			{
+				loginQuery = !loginQuery; //Toggles what the submit button later will do
+
+				let space = document.createElement("br");
+
+				let fillerSpan = document.createElement("span");
+				fillerSpan.innerHTML = "       ";
+				
+				let tempUsername = document.createElement("div");
+				tempUsername.innerHTML = "Username: ";
+
+				let tempUsernameFill = document.createElement("input");
+				tempUsernameFill.className = "inputCSS";
+				tempUsernameFill.type = "text";
+				tempUsernameFill.name = "usernameHTML";
+				tempUsername.appendChild(tempUsernameFill);
+
+				let tempPassword = document.createElement("div");
+				tempPassword.innerHTML = "Password: ";
+
+				let tempPasswordFill = document.createElement("input");
+				tempPasswordFill.name = "passwordHTML";
+				tempPasswordFill.type = "text";
+				tempPasswordFill.className = "inputCSS";
+				tempPassword.appendChild(tempPasswordFill);
+
+				let loginButton = document.createElement("button");
+				if (isLogin)
+				{
+					loginButton.innerHTML = "Login";
+				}
+				else
+				{
+					loginButton.innerHTML = "Create Account";
+				}
+				loginButton.addEventListener("click", function() {
+					if (loginQuery)
+					{
+						login(loginDiv.children[0].querySelector("input").value, loginDiv.children[1].querySelector("input").value);
+					}
+					else
+					{
+						let newUsername = loginDiv.children[0].querySelector("input").value
+						if (newUsername == "")
+						{
+							alert("Bruh enter a username");
+							return;
+						}
+
+						if (checkDuplicate(newUsername))
+						{
+							alert('This username already exists');
+							return;
+						}
+
+						createUser(newUsername, loginDiv.children[1].querySelector("input").value);
+
+						loginDiv.children[0].querySelector("input").value = "";
+						loginDiv.children[1].querySelector("input").value = "";
+					}
+				})
+
+				let swapButton = document.createElement("button");
+				if (isLogin)
+				{
+					swapButton.innerHTML = "Create new Account"
+				}
+				else
+				{
+					swapButton.innerHTML = "Return to login";
+				}
+				swapButton.addEventListener("click", function(){
+					divSwap(!loginQuery);
+				})
+
+				loginDiv.className = "frontalBackendTransfade";
+
+				window.setTimeout(function() {
+					if (isLogin)
+					{
+						loginDiv.innerHTML = "Login";
+					}
+					else
+					{
+						loginDiv.innerHTML = "Create New Account";
+					}
+
+					loginDiv.appendChild(space);
+					loginDiv.appendChild(tempUsername);
+					loginDiv.appendChild(space);
+					loginDiv.appendChild(space);
+					loginDiv.appendChild(tempPassword);
+					loginDiv.appendChild(space);
+					loginDiv.appendChild(loginButton);
+					loginDiv.appendChild(fillerSpan);
+					loginDiv.appendChild(swapButton);
+
+				}, 2000);
+
+				window.setTimeout(function() {
+					loginDiv.className = "whatever";
+				}, 4000) //4000 because setTimeout is asynchronous
+			}
+		</script>
+	</head>
+	<body onload="initialize();">
+		<h1>
+			HODDIT
+		</h1>
+		<h2>The world's most accurate and reliable self-diagnosis machine</h2>
+
+		<hr />
+
+		<div id="loginDivHTML">
+		</div>
+		<img src="Images/tmgSeal1.jpg" />
+		<img src="Images/tmgSeal2.jpg" />
+		<img src="Images/tmgSeal3.jpg" />
+		<span>This project is sponsored by Seals</span>
+	</body>
+</html>

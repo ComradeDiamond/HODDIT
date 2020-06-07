@@ -109,6 +109,22 @@
 				padding-bottom: 2%;
 				width: 20%;
 			}
+			.tempImages
+			{
+				position: relative;
+				left: 40%;
+				width: 10%;
+				top: 8vh;
+			}
+			.diagnosisButtonCSS
+			{
+				background-color: #03fc88;
+				font: 18pt calibri light;
+			}
+			p + img
+			{
+				cursor: pointer;
+			}
 		</style>
 		<script src="diagnosis.js"></script>
 		<script>
@@ -124,6 +140,17 @@
 
 				//addElement([symptomList.tummyAche]);
 				exOut();
+
+				try
+				{
+					userPosition = parseInt(JSON.parse(localStorage.userPosition));
+					localStorageArray = JSON.parse(localStorage.data);
+					record = localStorageArray[userPosition].record;
+				}
+				catch
+				{
+					console.log("There is a issue");
+				}
 			}
 			function imageSwap(imgName) {
 				mainImage.src = `Images/${imgName}.jpg`;
@@ -203,9 +230,20 @@
 			}
 			function displayGuess(topGuess) { //Display the best guess
 
+				if (topGuess == "none")
+				{
+					alert("You're healthy");
+					return;
+				}
+
 				treatmentsJS.innerHTML = ""; //First things first, just clear all the stuff inside treatmentJS
 
 				diagnosisJS.innerHTML = topGuess.name;
+
+				//Adds the items to the JSON
+				record.push(topGuess.name);
+				localStorage.data = JSON.stringify(localStorageArray);
+
 				let tempSymptom = "";
 
 				for (var i in topGuess.symptoms)
@@ -232,8 +270,7 @@
 					tempDiv.className = "treatmentDescriptionCSS";
 
 					let tempImg = document.createElement("img");
-					tempImg.style.left = "30%";
-					tempImg.width = "5%";
+					tempImg.className = "tempImages";
 					tempImg.src = topGuess.treatment[c].image;
 
 					treatmentsJS.appendChild(tempSpan);
@@ -249,9 +286,10 @@
 			Sumbit your symptoms through the machine, and when you're ready, hit the diagnoise button!<br />
 			Note that some symptoms will only be unlocked through other symptoms. <br />
 			Those symptoms appear in gold and usually leads to a decisive conclusion. <br />
-			Seal is not responsible for any brainlet things you might do with this tool.
+			Seal is not responsible for any brainlet things you might do with this tool. <br />
+			Speaking of seals, click the chonky seal to access your medical records.
 		</p>
-		<img src="Images/chonkySeal.jpg" />
+		<img src="Images/chonkySeal.jpg" onclick="window.open('record.html');"/>
 		<hr />
 
 		<!--Determines the sex of the model.-->
@@ -288,7 +326,7 @@
 			Symptom Selection <br />
 		</div>
 
-		<button onclick="displayGuess(flu);">Diagnosis</button>
+		&emsp;&emsp;<button onclick="processTopGuess();" class="diagnosisButtonCSS">Diagnose</button>
 		<hr />
 
 		<!--Tells you what thing you have-->
